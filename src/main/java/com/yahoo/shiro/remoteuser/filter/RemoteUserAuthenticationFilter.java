@@ -89,7 +89,8 @@ public final class RemoteUserAuthenticationFilter extends AuthenticatingFilter {
             return Collections.emptySet();
         }
         HttpServletRequest httpRequest = WebUtils.toHttp(request);
-        String rolesString = httpRequest.getHeader(remoteRolesHeaderName);
+        // String rolesString = httpRequest.getHeader(remoteRolesHeaderName);
+        String rolesString = "a,b";
         if (rolesString == null) {
             return Collections.emptySet();
         } 
