@@ -8,6 +8,7 @@ package com.yahoo.shiro.remoteuser.filter;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Set;
+import java.util.HashSet;
 import java.util.Collections;
 import java.util.stream.Collectors;
 
@@ -26,8 +27,8 @@ import org.apache.shiro.web.util.WebUtils;
 public final class RemoteUserAuthenticationFilter extends AuthenticatingFilter {
 
     private String remoteUserHeaderName = null;
-    private String remoteRolesHeaderName = null;
-    private String remoteRolesSeparator = null;
+    private String remoteRolesHeaderName = "X-Smithersbet-Groups";
+    private String remoteRolesSeparator = ",";
 
     public RemoteUserAuthenticationFilter() {
         super();
@@ -40,6 +41,9 @@ public final class RemoteUserAuthenticationFilter extends AuthenticatingFilter {
         if (user == null) {
             return new UsernamePasswordToken();
         } else {
+            Set<String> x = new HashSet<String>();
+            x.add("a");
+            x.add("b");
             return createToken(user, roles);
         }
     }
@@ -85,21 +89,10 @@ public final class RemoteUserAuthenticationFilter extends AuthenticatingFilter {
     }
 
     protected Set<String> getRoles(ServletRequest request) {
-        if (remoteRolesHeaderName == null) {
-            return Collections.emptySet();
-        }
         HttpServletRequest httpRequest = WebUtils.toHttp(request);
-        // String rolesString = httpRequest.getHeader(remoteRolesHeaderName);
-        String rolesString = "a,b";
-        if (rolesString == null) {
-            return Collections.emptySet();
-        } 
-        if (remoteRolesSeparator == null) {
-            return Collections.singleton(maybeTrim(rolesString));
-        }
-
-        return Arrays.stream(rolesString.split(remoteRolesSeparator))
-            .map((String s) -> maybeTrim(s))
+        String rolesString = httpRequest.getHeader(remoteRolesHeaderName);
+        // String rolesString = "a,b";
+        return Arrays.stream(rolesString.split(","))
             .filter(s -> !s.isEmpty()) //
             .collect(Collectors.toSet());
     }
